@@ -5,9 +5,15 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 class Main {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String BOLD = "\033[0;1m";
+
+
     private int numbersAmount;
     private int lowerBound;
     private int upperBound;
+    private long timeLimit;
 
     private void obtainArraySize() {
         Scanner scan1 = new Scanner(System.in);
@@ -67,9 +73,32 @@ class Main {
         while(continueInput);
     }
 
+    private void obtainTimeLimit(){
+        boolean input = true;
+
+        Scanner sc = new Scanner(System.in);
+
+        do{
+            try{
+                System.out.print("Enter maximum computation time in seconds: ");
+                timeLimit = sc.nextLong();
+
+                while(timeLimit == 0){
+                    System.out.print("Your computation time cannot be equal to 0! Try again... ");
+                    timeLimit = sc.nextLong();
+                }
+
+                input = false;
+            }catch(InputMismatchException ex) {
+                System.out.print("Incorrect input: an integer is required!\n\n");
+                sc.nextLine();
+            }
+        }while(input);
+    }
+
     void infiniteLoopException(){
         System.out.println("\n\n\n########################################");
-        System.out.println("\t\t\t!!!ERROR!!!\nEntered infinite loop! Exiting program!");
+        System.out.println("\t\t\t!!!ERROR!!!\nExceeded computation time! Exiting program!");
         System.out.println("########################################");
 
         System.exit(0);
@@ -93,6 +122,9 @@ class Main {
         Main obj2 = new Main();
         obj2.obtainBoundaries();
 
+        Main obj3 = new Main();
+        obj3.obtainTimeLimit();
+
         Main except = new Main();
 
         RNG randomNumber_obj = new RNG();
@@ -109,7 +141,7 @@ class Main {
             System.out.println("\nSize of list: "+randomNumber_obj.list.size());
 
             //Force exit condition
-            if(System.currentTimeMillis()-startTime > 3000){
+            if(System.currentTimeMillis()-startTime > obj3.timeLimit * 1000){
                 except.infiniteLoopException();
             }
         }
@@ -118,8 +150,11 @@ class Main {
         System.out.println("\n+----------------------------------------------+");
         System.out.println("Final List output: ");
         for(int i = 0; i < randomNumber_obj.list.size(); i++){
-            System.out.print(randomNumber_obj.list.get(i));
+            System.out.print(i+1 + ". " + BOLD + ANSI_PURPLE + randomNumber_obj.list.get(i) + ANSI_RESET + " ");
             System.out.print(" ");
+            if (i % 20 == 0 && i != 0){
+                System.out.println(" ");
+            }
         }
     }
 }
